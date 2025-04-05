@@ -9,19 +9,42 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@prisma/client": "^6.5.0",
+    "@supabase/auth-helpers-nextjs": "^0.10.0",
+    "@supabase/supabase-js": "^2.49.4",
+    "@tanstack/react-query": "^5.71.1",
+    "axios": "^1.8.4",
+    "bcrypt": "^5.1.1",
+    "framer-motion": "^12.6.2",
+    "jsonwebtoken": "^9.0.2",
+    "lucide-react": "^0.486.0",
+    "next": "15.2.4",
+    "next-auth": "^4.24.11",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "next": "15.2.4"
+    "react-google-recaptcha": "^3.1.0",
+    "react-icons": "^5.5.0",
+    "react-toastify": "^11.0.5",
+    "zod": "^3.24.2"
   },
   "devDependencies": {
-    "typescript": "^5",
-    "@types/node": "^20",
+    "@eslint/eslintrc": "^3.3.1",
+    "@tailwindcss/postcss": "^4.0.17",
+    "@types/bcrypt": "^5.0.2",
+    "@types/node": "^20.17.29",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@tailwindcss/postcss": "^4",
-    "tailwindcss": "^4",
-    "eslint": "^9",
-    "eslint-config-next": "15.2.4",
-    "@eslint/eslintrc": "^3"
+    "@types/react-google-recaptcha": "^2.1.9",
+    "daisyui": "^5.0.9",
+    "eslint": "^9.23.0",
+    "eslint-config-next": "^15.2.4",
+    "prisma": "^6.5.0",
+    "tailwindcss": "^4.0.17",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
   }
 }

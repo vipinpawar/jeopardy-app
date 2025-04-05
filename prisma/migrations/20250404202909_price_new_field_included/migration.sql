@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "Item" ADD COLUMN     "lifetimePrice" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN     "monthlyPrice" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN     "yearlyPrice" INTEGER NOT NULL DEFAULT 0;

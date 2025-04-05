@@ -1,0 +1,132 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                  String     @id @default(cuid())
+  email               String     @unique
+  username            String
+  password            String
+  createdAt           DateTime   @default(now())
+  role                String     @default("user")
+  totalAmount         Int        @default(0)
+  membership          Membership @default(FREE)
+  membershipEndDate   DateTime?
+  membershipStartDate DateTime?
+  addresses           Address[]
+  cart                Cart[]
+  purchases           Purchase[]
+  wishlists           Wishlist[]
+}
+
+model Address {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String   @default("Home")
+  street    String
+  city      String
+  state     String
+  pin       String
+  country   String
+  mobile    String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Question {
+  id            Int      @id @default(autoincrement())
+  points        Int
+  question      String
+  options       String[]
+  correctAnswer String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  category      Category
+}
+
+enum Category {
+  SCIENCE
+  HISTORY
+  SPORTS
+}
+
+model category {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  blogs     Blog[]
+}
+
+model Blog {
+  id         String   @id @default(uuid())
+  title      String
+  image      String
+  content    String
+  categoryId String
+  createdAt  DateTime @default(now())
+  category   category @relation(fields: [categoryId], references: [id])
+}
+
+model Item {
+  id            String     @id @default(cuid())
+  name          String
+  category      String
+  basePrice     Int
+  monthlyPrice  Int       @default(0)
+  yearlyPrice   Int       @default(0)
+  lifetimePrice Int       @default(0)
+  imageUrl      String
+  createdAt     DateTime   @default(now())
+  downloadUrl   String?
+  cart          Cart[]
+  purchases     Purchase[]
+  wishlists     Wishlist[]
+}
+
+model Purchase {
+  id          String   @id @default(cuid())
+  userId      String
+  itemId      String
+  pricePaid   Int
+  purchasedAt DateTime @default(now())
+  status      String   @default("Processing")
+  item        Item     @relation(fields: [itemId], references: [id])
+  user        User     @relation(fields: [userId], references: [id])
+}
+
+model Wishlist {
+  id        String   @id @default(cuid())
+  userId    String
+  itemId    String
+  createdAt DateTime @default(now())
+  item      Item     @relation(fields: [itemId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, itemId])
+}
+
+model Cart {
+  id        String   @id @default(cuid())
+  userId    String
+  itemId    String
+  quantity  Int      @default(1)
+  createdAt DateTime @default(now())
+  item      Item     @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, itemId])
+}
+
+enum Membership {
+  FREE
+  MONTHLY
+  YEARLY
+  LIFETIME
+}
+
+
