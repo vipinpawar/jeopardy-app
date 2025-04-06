@@ -6,6 +6,7 @@ import axios from "axios";
 import { Loader2, ShoppingCart, Heart, PlusCircle } from "lucide-react";
 import { toast } from "react-toastify";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation"; // Add useRouter for redirection
 
 interface Category {
   category: string;
@@ -38,7 +39,7 @@ const fetchUserMembership = async (): Promise<string> => {
 };
 
 const fetchAllItems = async (): Promise<Item[]> => {
-  const res = await axios.get("/api/store/items/get-all-items"); // New endpoint for all items
+  const res = await axios.get("/api/store/items/get-all-items");
   return res.data.items || [];
 };
 
@@ -54,8 +55,7 @@ const fetchWishlist = async (): Promise<WishlistItem[]> => {
 
 const StorePage: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [purchasingItemId, setPurchasingItemId] = useState<string | null>(null);
-
+  const router = useRouter(); // Initialize router
   const queryClient = useQueryClient();
 
   const { data: categories = [] } = useQuery({ queryKey: ["categories"], queryFn: fetchCategories });
@@ -95,19 +95,6 @@ const StorePage: React.FC = () => {
     },
   });
 
-  const purchaseMutation = useMutation({
-    mutationFn: async (itemId: string) => {
-      setPurchasingItemId(itemId);
-      const res = await axios.post("/api/store/purchase", { cartItems: [{ itemId }] });
-      if (res.data.success) {
-        toast.success("🎉 Purchase successful!");
-      } else {
-        toast.warning(res.data.message || "⚠️ Purchase failed!");
-      }
-      setPurchasingItemId(null);
-    },
-  });
-
   const getPriceForMembership = (item: Item): number => {
     switch (membership) {
       case "MONTHLY":
@@ -119,6 +106,10 @@ const StorePage: React.FC = () => {
       default:
         return item.basePrice;
     }
+  };
+
+  const handleBuyNow = (itemId: string) => {
+    router.push(`/store/checkout?itemId=${itemId}`);
   };
 
   return (
@@ -136,7 +127,7 @@ const StorePage: React.FC = () => {
       />
 
       <div className="flex flex-wrap gap-4 justify-center mb-8">
-      <button
+        <button
           onClick={() => setSelectedCategory(null)}
           className={`px-4 py-2 rounded-lg text-white ${selectedCategory === null ? "bg-indigo-700" : "bg-indigo-500"} hover:bg-indigo-600 transition-all cursor-pointer`}
         >
@@ -185,7 +176,10 @@ const StorePage: React.FC = () => {
                   <button className="bg-gray-500 text-white py-2 px-4 rounded-xl cursor-pointer" onClick={() => addToCartMutation.mutate(item.id)}>
                     <PlusCircle className="w-5 h-5 mr-2 inline" /> Add to Cart
                   </button>
-                  <button className="bg-indigo-600 text-white py-2 px-4 ml-11 rounded-xl cursor-pointer" onClick={() => purchaseMutation.mutate(item.id)}>
+                  <button
+                    className="bg-indigo-600 text-white py-2 px-4 ml-11 rounded-xl cursor-pointer"
+                    onClick={() => handleBuyNow(item.id)} 
+                  >
                     <ShoppingCart className="w-5 h-5 mr-2 inline" /> Buy Now
                   </button>
                 </div>

@@ -210,7 +210,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user }) => {
 
       {/* Address Section */}
       <div className="mt-6">
-        <h2 className="text-xl font-semibold text-gray-800 mb-2">Address</h2>
+        <h2 className="text-xl font-semibold text-gray-800 mb-2">Shipping Address</h2>
         {currentAddress ? (
           <div>
             <p>{currentAddress.street}</p>

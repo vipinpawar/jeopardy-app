@@ -21,7 +21,7 @@ interface CartItem {
 
 interface CartSectionProps {
   cart: CartItem[];
-  getPriceForMembership: (item: Item) => number; // Updated prop name
+  getPriceForMembership: (item: Item) => number;
   handleRemoveFromCart: (id: string) => void;
   calculateTotal: () => number;
   handleBuyAll: () => Promise<void>;
@@ -54,17 +54,6 @@ const CartSection: React.FC<CartSectionProps> = ({
     onError: (error) => {
       console.error("Quantity update error:", error);
       toast.error("Failed to update quantity.");
-    },
-  });
-
-  const purchaseMutation = useMutation({
-    mutationFn: handleBuyAll,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["profileData"] });
-    },
-    onError: (error) => {
-      console.error("Purchase error:", error);
-      toast.error("Failed to process purchase.");
     },
   });
 
@@ -133,11 +122,11 @@ const CartSection: React.FC<CartSectionProps> = ({
           </div>
 
           <button
-            className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl font-semibold mt-4 ml-100 cursor-pointer"
-            onClick={() => purchaseMutation.mutate()}
-            disabled={purchaseMutation.isPending || purchasingItemId !== null}
+            className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl font-semibold mt-4 w-full cursor-pointer"
+            onClick={handleBuyAll} // Use handleBuyAll for redirection
+            disabled={purchasingItemId !== null}
           >
-            {purchaseMutation.isPending || purchasingItemId ? "Processing..." : "Buy All"}
+            {purchasingItemId ? "Processing..." : "Buy All"}
           </button>
         </>
       )}

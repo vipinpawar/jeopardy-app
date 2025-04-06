@@ -7,6 +7,7 @@ import Link from "next/link";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation"; // Add useRouter
 import ProfileHeader from "@/app/components/ProfileHeader";
 import OrderSection from "@/app/components/OrderSection";
 import CartSection from "@/app/components/CartSection";
@@ -67,6 +68,7 @@ interface WishlistItem {
 function ProfilePage() {
   const [purchasingItemId, setPurchasingItemId] = useState<string | null>(null);
   const queryClient = useQueryClient();
+  const router = useRouter(); // Initialize router
 
   const fetchProfileData = async () => {
     const [profileRes, ordersRes, wishlistRes, cartRes] = await Promise.all([
@@ -121,35 +123,17 @@ function ProfilePage() {
       toast.warning("Your cart is empty!");
       return;
     }
-
-    setPurchasingItemId("all");
-    try {
-      await axios.post("/api/store/purchase", {
-        cartItems: cart.map((cartItem) => ({
-          itemId: cartItem.item.id,
-          quantity: cartItem.quantity,
-        })),
-      });
-      await axios.delete("/api/store/user/cart/deleteCartItems");
-      queryClient.invalidateQueries({ queryKey: ["profileData"] });
-      toast.success("Purchase successful!");
-    } catch (error) {
-      toast.error("Error processing your order.");
-    } finally {
-      setPurchasingItemId(null);
-    }
+    // Redirect to checkout page with cart items
+    const cartItemsQuery = cart.map((cartItem) => `cartItem=${cartItem.item.id}:${cartItem.quantity}`).join("&");
+    router.push(`/store/checkout?${cartItemsQuery}`);
   };
 
   const getPriceForMembership = (item: (Item | (Omit<Item, "id"> & { imageUrl: string })) | undefined): number => {
-    console.log("getPriceForMembership input:", item); // Debugging
-    if (!item) {
-      console.log("Item is undefined, returning 0");
-      return 0;
-    }
+    if (!item) return 0;
     const price = (() => {
       switch (user?.membership) {
         case "MONTHLY":
-          return item.monthlyPrice ?? item.basePrice; // Fallback to basePrice if undefined
+          return item.monthlyPrice ?? item.basePrice;
         case "YEARLY":
           return item.yearlyPrice ?? item.basePrice;
         case "LIFETIME":
@@ -158,8 +142,7 @@ function ProfilePage() {
           return item.basePrice;
       }
     })();
-    console.log("Calculated price:", price); // Debugging
-    return price ?? 0; // Fallback to 0 if price is still undefined
+    return price ?? 0;
   };
 
   const calculateTotal = () => {
